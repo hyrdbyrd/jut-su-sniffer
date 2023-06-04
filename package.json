@@ -1,10 +1,10 @@
 {
-    "name": "sniff",
+    "name": "movie-disk-sniffer",
     "version": "1.0.0",
     "description": "",
     "main": "index.js",
     "scripts": {
-        "start": "npx --max-old-space-size=12000 ts-node index.ts --p onepunchman https://jut.su/onepunchman"
+        "start": "npx --max-old-space-size=12000 ts-node --project tsconfig.json src/index.ts --r 4  https://jut.su/berserk/"
     },
     "keywords": [],
     "author": "",

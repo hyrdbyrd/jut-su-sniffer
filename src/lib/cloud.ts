@@ -1,7 +1,8 @@
-import axios, { Method } from 'axios';
 import dotenv from 'dotenv';
-import { request } from 'https';
 import { parse } from 'url';
+import { request } from 'https';
+import { Stream } from 'stream';
+import axios, { Method } from 'axios';
 
 import { createUrl } from './url';
 
@@ -26,7 +27,7 @@ export const createFolder = (path: string) =>
         .then(() => true)
         .catch(() => false);
 
-export const uploadFile = (path: string, blob: any) =>
+export const uploadFile = (path: string, blob: Stream) =>
     fetch
         .get<{ href: string; method: Method }>(
             createUrl('https://cloud-api.yandex.net/v1/disk/resources/upload', { path, overwrite: 'true' })
