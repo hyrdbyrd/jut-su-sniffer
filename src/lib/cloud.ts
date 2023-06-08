@@ -19,7 +19,8 @@ export const hasFile = (folderPath: string, fileName: string) =>
         .get<{ _embedded: { items: Array<{ name: string }> } }>(
             createUrl('https://cloud-api.yandex.net/v1/disk/resources', { path: folderPath })
         )
-        .then((e) => e.data._embedded.items.some((e) => e.name === fileName));
+        .then((e) => e.data?._embedded?.items?.some((e) => e.name === fileName))
+        .catch(() => false);
 
 export const createFolder = (path: string) =>
     fetch

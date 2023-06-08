@@ -16,6 +16,7 @@ export type GetSeasonsFn = (input: string) => Promise<Seasons | null>;
 export type GetMovieFn = (src: string, seria: Seria) => Promise<Stream>;
 
 export interface ParseFns {
+    name: string;
     getTitle: GetTitle;
     getMovie: GetMovieFn;
     getSeasons: GetSeasonsFn;

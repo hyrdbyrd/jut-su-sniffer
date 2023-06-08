@@ -1,6 +1,6 @@
 import { getArgv } from './cli';
 import { wait } from './lib/helpers';
-import { log, logStatus } from './lib/log';
+import { log, logProggress, logStatus } from './lib/log';
 import { createFolder, uploadFile, hasFile } from './lib/cloud';
 
 import type { Seria, Parsers } from './entity/types';
@@ -15,6 +15,8 @@ const parsersList: Parsers[] = [jutSuParsers];
 
 (async () => {
     const { retries, input, seasonsInclude, folderPath } = await getArgv();
+
+    log('Начинаем парсинг');
 
     process.on('exit', () =>
         logStatus(
@@ -32,6 +34,8 @@ const parsersList: Parsers[] = [jutSuParsers];
     const seasons = await parsers?.getSeasons(input);
     if (!seasons || !parsers) return log('Парсер не написан на этот сайт 😣');
     if (!seasonsInclude.length) seasonsInclude.push(...Object.keys(seasons).map(Number));
+
+    log(`В качестве парсера выбран ${parsers.name}`);
 
     const waitFor = [];
     for (const season of seasonsInclude)
@@ -53,21 +57,24 @@ const parsersList: Parsers[] = [jutSuParsers];
 
                         const movie = await parsers.getMovie(src, seria);
 
-                        const isOk = await uploadFile(mkFilePath(folder, { ...opt, full: true }), movie);
-                        if (!isOk) throw new Error('Not ok');
+                        const isFileUploaded = await uploadFile(mkFilePath(folder, { ...opt, full: true }), movie);
+                        if (!isFileUploaded) throw new Error('Not ok');
 
                         done.push(seria);
-                    } catch (e) {
-                        await wait();
-                        continue;
-                    }
 
-                    errored.push(seria);
+                        // Выходим из цепочки ретраев
+                        break;
+                    } catch (e) {
+                        errored.push(seria);
+                        await wait();
+                    }
                 }
             })();
 
             waitFor.push(promise);
         }
+
+    logProggress.clean();
 
     await Promise.all(waitFor);
 

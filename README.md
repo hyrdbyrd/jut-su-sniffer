@@ -1,4 +1,4 @@
-# Jut-Su Sniffer
+# Movie Disk Sniffer
 
 Где взять токен https://yandex.ru/dev/disk/api/concepts/quickstart.html
 

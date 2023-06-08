@@ -44,7 +44,8 @@ const getSeasons: GetSeasonsFn = (input: string): Promise<Seasons | null> => {
         )
         .catch((error) => {
             devLog('Не удалось получить сезоны и серии');
-            throw new Error(error);
+            devLog(error);
+            return null;
         });
 };
 
@@ -68,7 +69,7 @@ const getMovie: GetMovieFn = async (src: string, seria: Seria) =>
     html
         .get<Stream>(src, {
             responseType: 'stream',
-            onDownloadProgress: logProggress(`Загружаем ${mkSeria({ ...seria, full: true })}: `),
+            onDownloadProgress: logProggress(`Загружаем ${mkSeria({ ...seria, full: true })}`),
         })
         .then((e) => e.data);
 
@@ -82,4 +83,5 @@ export const jutSuParsers: Parsers = {
     getSeasons,
     getMovieSrc,
     isRightDomain,
+    name: 'jut-su',
 };

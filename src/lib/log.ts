@@ -1,7 +1,10 @@
+import dotenv from 'dotenv';
 import { AxiosProgressEvent } from 'axios';
 
+dotenv.config();
+
 export const log = (...args: any[]) => {
-    console.clear();
+    !process.env.DEBUG && console.clear();
     console.log(...args);
 };
 
@@ -18,20 +21,47 @@ export const logStatus = (done: string[], errored: string[]) =>
     `);
 
 export const logProggress = (() => {
-    const pfxses: Record<string, string> = {};
-    return (prefix: string = '') => {
-        pfxses[prefix] = '';
+    const pfxses: Record<string, number> = {};
+    const pfxsesList: string[] = [];
 
-        return ({ progress = 0 }: AxiosProgressEvent) => {
-            pfxses[prefix] = `${prefix}${(progress * 100) | 0}%`;
+    const mkPercent = (p: number) => `${p}%`;
+    const mkPrefix = (pfx: string, percent: number) => {
+        const prefix = pfx.padEnd(Math.max(...Object.keys(pfxses).map((e) => e.length)), ' ');
+        const pr = mkPercent(percent).padStart(4, ' ');
 
-            const maxLen = Math.max(...Object.values(pfxses).map((e) => e.length));
+        return `${prefix} ${pr}`;
+    };
+
+    function resultFn(prefix: string = '') {
+        pfxses[prefix] = 0;
+        pfxsesList.push(prefix);
+
+        function progress({ progress = 0 }: Partial<AxiosProgressEvent>) {
+            pfxses[prefix] = (progress * 100) | 0;
 
             console.clear();
-            for (const [_, logFor] of Object.entries(pfxses).sort(([a], [b]) => a.length - b.length))
-                console.log(
-                    `${logFor.padEnd(maxLen, ' ')} [${'.'.repeat(Math.min(progress * 10, 10)).padEnd(10, ' ')}]`
-                );
+            for (const pf of pfxsesList) {
+                const percent = pfxses[pf];
+                console.log(`${mkPrefix(pf, percent)} [${'.'.repeat(Math.min(percent / 10, 10)).padEnd(10, ' ')}]`);
+            }
+        }
+
+        progress.prefix = prefix;
+        progress.cleanPrefix = () => {
+            const idx = pfxsesList.indexOf(prefix);
+            idx !== -1 && pfxsesList.splice(idx, 1);
+
+            delete pfxses[prefix];
         };
+
+        return progress;
+    }
+
+    resultFn.getPrefixes = () => JSON.parse(JSON.stringify(pfxses));
+    resultFn.clean = () => {
+        for (const key in pfxses) delete pfxses[key];
+        pfxsesList.splice(0, pfxsesList.length);
     };
+
+    return resultFn;
 })();
