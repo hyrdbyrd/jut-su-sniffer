@@ -13,12 +13,17 @@ export const devLog = (...args: any[]) => {
     console.warn(...args);
 };
 
-export const logStatus = (done: string[], errored: string[]) =>
-    log(`
+export const logStatus = (done: string[], errored: string[]) => {
+    if (done.length || errored.length) {
+        log(`
 Завершено ✅: ${['', ...done].join('\n    ')}
 
 Упало ❌: ${['', ...errored].join('\n    ')}
     `);
+    }
+
+    log('Что-то пошло не так - ничего загружалось вовсе');
+};
 
 export const logProggress = (() => {
     const pfxses: Record<string, number> = {};

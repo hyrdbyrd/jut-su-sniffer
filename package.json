@@ -5,7 +5,7 @@
     "main": "src/index.ts",
     "scripts": {
         "test": "jest",
-        "start": "npx --max-old-space-size=12000 ts-node --project tsconfig.json src/index.ts --r 4 https://jut.su/berserk/"
+        "start": "npx --max-old-space-size=12000 ts-node --project tsconfig.json src/index.ts --r 4 https://jut.su/nanatsu-taizai/"
     },
     "keywords": [],
     "author": "",
